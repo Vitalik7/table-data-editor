@@ -35,6 +35,7 @@ class App extends Component {
     this.inputEmpty = this.inputEmpty.bind(this)
     this.changeValue = this.changeValue.bind(this)
     this.save = this.save.bind(this)
+    this.exportToJson = this.exportToJson.bind(this)
   }
 
   displayData(content) {
@@ -157,6 +158,15 @@ class App extends Component {
     e.preventDefault()
   }
 
+  exportToJson () {
+    let dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.state.elements));
+    let dlAnchorElem = document.getElementById('downloadAnchorElem');
+    dlAnchorElem.setAttribute('href', dataStr);
+    dlAnchorElem.setAttribute('download', 'text-data-editor.json');
+    dlAnchorElem.click();
+
+  }
+
   render() {
     const jsonStr = JSON.stringify(this.state.elements)
     const textJson = this.state.textJson
@@ -169,7 +179,7 @@ class App extends Component {
        <input type="file" onChange={this.handleFileSelect}/>
        { data && <p> {data} </p> }
      </div>
-        <h3> JSON </h3>
+        <h3>JSON</h3>
         <textarea
           onChange={this.changeValue}
           defaultValue={textJson}
@@ -178,9 +188,11 @@ class App extends Component {
           }
           value={textJson}
          rows="10" cols="40"></textarea>
-
-         <Button  onClick={this.save} style={{backgroundColor: '#e0e0e0', display: 'block'}}> update data </Button>
-
+         <a id="downloadAnchorElem" style={{display:'none'}}></a>
+         <div >
+           <Button  onClick={this.exportToJson} style={{backgroundColor: '#e0e0e0', display: 'inline-block'}}> export data to json </Button>
+           <Button  onClick={this.save} style={{backgroundColor: '#e0e0e0', display: 'inline-block'}}> update data </Button>
+         </div>
       </div>
 
         <form onSubmit={this.addElement} >
@@ -218,40 +230,51 @@ class App extends Component {
 
             return (
 
-              <li key={index} >
-                <input
-                  type='checkbox'
-                  checked={element.checked}
-                  onChange={() => this.checkboxChange(index)}
-                />
-                <TextField
-                  name='name'
-                  type='text'
-                  placeholder='name'
-                  className='TextField'
-                  style={{
-                    textDecoration: element.checked ? 'line-through' : 'none',
-                    color: element.checked ? 'gray' : 'black'
-                  }}
-                  value={element.name}
-                  onChange={event => this.nameChange(event, index)}
-                />
+              <ReactDragList
+                 dataSource={this.state.elements}
+                 rowKey="title"
+                 row={(record, index) => (
+                   <li key={index} >
+                     <input
+                       type='checkbox'
+                       checked={element.checked}
+                       onChange={() => this.checkboxChange(index)}
+                     />
+                     <TextField
+                       name='name'
+                       type='text'
+                       placeholder='name'
+                       className='TextField'
+                       style={{
+                         textDecoration: element.checked ? 'line-through' : 'none',
+                         color: element.checked ? 'gray' : 'black'
+                       }}
+                       value={element.name}
+                       onChange={event => this.nameChange(event, index)}
+                     />
 
-                <TextField
-                  name='value'
-                  type='text2'
-                  placeholder='value'
-                  className='TextField'
-                  style={{
-                    textDecoration: element.checked ? 'line-through' : 'none',
-                    color: element.checked ? 'gray' : 'black'
-                  }}
-                  value={element.value}
-                  onChange={event => this.valueChange2(event, index)}
-                />
+                     <TextField
+                       name='value'
+                       type='text2'
+                       placeholder='value'
+                       className='TextField'
+                       style={{
+                         textDecoration: element.checked ? 'line-through' : 'none',
+                         color: element.checked ? 'gray' : 'black'
+                       }}
+                       value={element.value}
+                       onChange={event => this.valueChange2(event, index)}
+                     />
 
-                <button onClick={() => this.removeElement(index)} style={{color: 'red'}} > X </button>
-              </li>
+                     <button onClick={() => this.removeElement(index)} style={{color: 'red'}} > X </button>
+                   </li>
+                 )}
+                 handles={false}
+                 className="simple-drag"
+                 rowClassName="simple-drag-row"
+              />
+
+
             )
           }
         )}
