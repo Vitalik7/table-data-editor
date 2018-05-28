@@ -5,17 +5,11 @@
   "homepage": "https://vitalik7.github.io/table-data-editor/",
   "dependencies": {
     "@material-ui/core": "^1.0.0",
-    "jsonfile": "^4.0.0",
     "material-ui": "^0.20.0",
     "muicss": "^0.9.39",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-drag-list": "^1.1.0",
-    "react-drag-listview": "0.0.9",
-    "react-grid-layout": "^0.16.6",
-    "react-scripts": "1.0.17",
-    "react-sortable-hoc": "^0.8.0",
-    "write-json-file": "^2.3.0"
+    "react-scripts": "1.0.17"
   },
   "devDependencies": {
     "gh-pages": "^1.1.0",

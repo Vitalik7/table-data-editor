@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-
-import ReactDragList from 'react-drag-list'
-
 import './App.css';
 
 class App extends Component {
   constructor(props) {
     super(props)
-
     this.state = {
       elements: [],
       text: '',
@@ -26,15 +20,15 @@ class App extends Component {
     this.displayData = this.displayData.bind(this);
     this.addElement = this.addElement.bind(this)
     this.inputChange = this.inputChange.bind(this)
-    this.inputChange2 = this.inputChange2.bind(this)
+    this.inputValue = this.inputValue.bind(this)
     this.nameChange = this.nameChange.bind(this)
-    this.valueChange2 = this.valueChange2.bind(this)
+    this.valueChange = this.valueChange.bind(this)
     this.removeElement = this.removeElement.bind(this)
     this.checkboxChange = this.checkboxChange.bind(this)
     this.changeMode = this.changeMode.bind(this)
     this.inputEmpty = this.inputEmpty.bind(this)
     this.changeValue = this.changeValue.bind(this)
-    this.save = this.save.bind(this)
+    this.updateData = this.updateData.bind(this)
     this.exportToJson = this.exportToJson.bind(this)
   }
 
@@ -42,7 +36,7 @@ class App extends Component {
       this.setState({textJson: content});
     }
 
-    handleFileSelect(evt) {
+  handleFileSelect(evt) {
       let files = evt.target.files;
       if (!files.length) {
         alert('No file select');
@@ -55,7 +49,7 @@ class App extends Component {
         that.displayData(e.target.result);
       };
       reader.readAsText(file);
-    }
+  }
 
   addElement(event) {
     event.preventDefault()
@@ -79,7 +73,7 @@ class App extends Component {
      })
   }
 
-  inputChange2(e) {
+  inputValue(e) {
     this.setState({
       text2: e.target.value
      })
@@ -93,7 +87,7 @@ class App extends Component {
     })
   }
 
-  valueChange2(e, ind) {
+  valueChange(e, ind) {
     this.state.elements[ind].value = e.target.value
     this.setState({
       elements: this.state.elements,
@@ -135,7 +129,7 @@ class App extends Component {
      })
 }
 
-  save (e, ind) {
+  updateData (e, ind) {
     try {
       let parsed = JSON.parse(this.state.textJson)
       if (Array.isArray(parsed)) {
@@ -173,118 +167,96 @@ class App extends Component {
     const data = this.state.data;
 
     return (
-      <div >
+      <div>
       <div className='json'>
       <div>
        <input type="file" onChange={this.handleFileSelect}/>
-       { data && <p> {data} </p> }
+       {data && <p> {data} </p>}
      </div>
         <h3>JSON</h3>
         <textarea
           onChange={this.changeValue}
-          defaultValue={textJson}
           placeholder={
             '[{"name":"...","value":"..."}' +  ',\n' + '{"name":"...","value":"..."}]'
           }
           value={textJson}
-         rows="10" cols="40"></textarea>
+          rows="10" cols="40"></textarea>
          <a id="downloadAnchorElem" style={{display:'none'}}></a>
-         <div >
-           <Button  onClick={this.exportToJson} style={{backgroundColor: '#e0e0e0', display: 'inline-block'}}> export data to json </Button>
-           <Button  onClick={this.save} style={{backgroundColor: '#e0e0e0', display: 'inline-block'}}> update data </Button>
+         <div>
+           <Button  onClick={this.exportToJson} className='exportData'> export data to json </Button>
+           <Button  onClick={this.updateData} className='updateData'> update data </Button>
          </div>
       </div>
+      <form onSubmit={this.addElement} >
+        <TextField
+          name='name'
+          type='text'
+          className='TextField'
+          placeholder='name'
+          value={this.state.text}
+          onChange={this.inputChange}
+        />
+        <TextField
+          name='value'
+          type='text'
+          className='TextField'
+          placeholder='value'
+          value={this.state.text2}
+          onChange={this.inputValue}
+        />
+        <Button variant="fab" type='submit' onClick={this.inputEmpty}>+</Button>
+      </form>
 
-        <form onSubmit={this.addElement} >
-          <TextField
-            name='name'
-            type='text'
-            className='TextField'
-            placeholder='name'
-            value={this.state.text}
-            onChange={this.inputChange}
-          />
-
-          <TextField
-            name='value'
-            type='text'
-            className='TextField'
-            placeholder='value'
-            value={this.state.text2}
-            onChange={this.inputChange2}
-          />
-
-          <Button variant="fab" type='submit' onClick={this.inputEmpty}>
-            +
-          </Button>
-
-        </form>
-
-        <ul>
-          {this.state.elements.map((element, index) => {
-            if (this.state.mode === 'checked' && !element.checked) {
-              return
-            } else if (this.state.mode === 'unchecked' && element.checked) {
-              return
-            }
-
-            return (
-
-              <ReactDragList
-                 dataSource={this.state.elements}
-                 rowKey="title"
-                 row={(record, index) => (
-                   <li key={index} >
-                     <input
-                       type='checkbox'
-                       checked={element.checked}
-                       onChange={() => this.checkboxChange(index)}
-                     />
-                     <TextField
-                       name='name'
-                       type='text'
-                       placeholder='name'
-                       className='TextField'
-                       style={{
-                         textDecoration: element.checked ? 'line-through' : 'none',
-                         color: element.checked ? 'gray' : 'black'
-                       }}
-                       value={element.name}
-                       onChange={event => this.nameChange(event, index)}
-                     />
-
-                     <TextField
-                       name='value'
-                       type='text2'
-                       placeholder='value'
-                       className='TextField'
-                       style={{
-                         textDecoration: element.checked ? 'line-through' : 'none',
-                         color: element.checked ? 'gray' : 'black'
-                       }}
-                       value={element.value}
-                       onChange={event => this.valueChange2(event, index)}
-                     />
-
-                     <button onClick={() => this.removeElement(index)} style={{color: 'red'}} > X </button>
-                   </li>
-                 )}
-                 handles={false}
-                 className="simple-drag"
-                 rowClassName="simple-drag-row"
-              />
-
-
-            )
+      <ul>
+        {this.state.elements.map((element, index) => {
+          if (this.state.mode === 'checked' && !element.checked) {
+            return
+          } else if (this.state.mode === 'unchecked' && element.checked) {
+            return
           }
-        )}
-        </ul>
-        <div className='btns'>
-          <Button className='btnMode' onClick={() => {this.changeMode('all')}}>All</Button>
-          <Button className='btnMode' onClick={() => {this.changeMode('checked')}}>Checked</Button>
-          <Button className='btnMode' onClick={() => {this.changeMode('unchecked')}}>Unchecked</Button>
-        </div>
+          return (
+           <li key={index} >
+             <input
+               type='checkbox'
+               checked={element.checked}
+               onChange={() => this.checkboxChange(index)}
+             />
+             <TextField
+               name='name'
+               type='text'
+               placeholder='name'
+               className='TextField'
+               style={{
+                 textDecoration: element.checked ? 'line-through' : 'none',
+                 color: element.checked ? 'gray' : 'black'
+               }}
+               value={element.name}
+               onChange={event => this.nameChange(event, index)}
+             />
+             <TextField
+               name='value'
+               type='text2'
+               placeholder='value'
+               className='TextField'
+               style={{
+                 textDecoration: element.checked ? 'line-through' : 'none',
+                 color: element.checked ? 'gray' : 'black'
+               }}
+               value={element.value}
+               onChange={event => this.valueChange(event, index)}
+             />
+             <button onClick={() => this.removeElement(index)} style={{color: 'red'}} > X </button>
+           </li>
+          )
+        }
+      )}
+      </ul>
+      <div className='btns'>
+        <Button className='btnMode' onClick={() => {this.changeMode('all')}}>All</Button>
+        <Button className='btnMode' onClick={() => {this.changeMode('checked')}}>Checked</Button>
+        <Button className='btnMode' onClick={() => {this.changeMode('unchecked')}}>Unchecked</Button>
       </div>
+    </div>
     );
   }
 }

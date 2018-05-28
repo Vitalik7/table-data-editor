@@ -43,9 +43,10 @@ form {
 margin-left: 8%;
 }
 
-.btnMode {
+.exportData, .updateData {
+  background-color: #e0e0e0;
+  display: inline-block;
 }
-
 
 @media screen and (max-device-width: 1205px), screen and (max-width: 1205px) {
   form {
